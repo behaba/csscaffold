@@ -500,12 +500,22 @@ class Controller
 	 * @return void
 	 * @author Anthony Short
 	 */
-	public static function cache_clear($path = "")
+	public static function cache_clear($path = "", $remove_lock = true)
 	{
 		if($path == "")
 			$path = self::config('core.path.cache');
 			
 		$path .= "/";
+		
+		$lock = self::config('core.path.cache') . 'cachelock';
+ 		
+		if(file_exists($lock))
+		{			
+			return true;
+		}
+
+		# Create a lock so multple processes can't try and empty the cache at once
+		file_put_contents($lock,getmypid());
 
 		foreach(scandir($path) as $file)
 		{
@@ -515,13 +525,18 @@ class Controller
 			}
 			elseif(is_dir($path.$file))
 			{
-				self::cache_clear($path.$file);
+				self::cache_clear($path.$file,false);
 				rmdir($path.$file);
 			}
 			elseif(file_exists($path.$file))
 			{
 				unlink($path.$file);
 			}
+		}
+		
+		if($remove_lock === true)
+		{
+			unlink($lock);
 		}
 	}
 	
