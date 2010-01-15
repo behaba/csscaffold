@@ -9,7 +9,7 @@
 
 
 class ColorReplace extends Scaffold_Module  {
-
+	
 	/* Invalid W3C color names and RGB equivalent */
 	public static $colorsname = array(
 		'aliceblue'=> 'rgb(240,248,255)',
@@ -149,16 +149,34 @@ class ColorReplace extends Scaffold_Module  {
 	* @param $k Key or black (percentage)
 	* @return $rgb array of rgb colors
 	*/
+	
+	
+	
+
+	
 	public static function _cmyk_to_rgb($c, $m, $y, $k) {
+		
+
+
+		$c = intval($c) / 100;
+		$m = intval($m) / 100;
+		$y = intval($y) / 100;
+		$k = intval($k) / 100;
+		
+		$r = intval((1-min(1,$c*(1-$k)+$k))*255+0.5);
+		$g = intval((1-min(1, $m * (1 - $k) + $k))*255+0.5);
+		$b = intval((1-min(1, $y * (1 - $k) + $k))*255+0.5);
+	
+		/*
 		$c = (255 * intval($c)) / 100;
 		$m = (255 * intval($m)) / 100;
 		$y = (255 * intval($y)) / 100;
 		$k = (255 * intval($k)) / 100;
-
+		
 		$r = round(((255 - $c) * (255 - $k)) / 255);
 		$g = round((255 - $m) * (255 - $k) / 255);
 		$b = round((255 - $y) * (255 - $k) / 255); 
-
+		*/
 		return array($r,$g,$b);
 	}
 
@@ -204,33 +222,49 @@ class ColorReplace extends Scaffold_Module  {
    * Example: "color: hsl(20, 80%, 50%);" => "color: rgb(128, 60, 26);"
    */
 	public static function pre_process() {
-		$parsed_color = array();
+	  
+	  # Get the Color Replace options from the config
+  	$color_replace_options = CSScaffold::config('ColorReplace');
+
+		// list parameters
+		$sheme_to_convert = array();
+		if ($color_replace_options['convert_hsl_colors'] == 1) $sheme_to_convert[] = 'hsl';
+		if ($color_replace_options['convert_hsla_colors'] == 1) $sheme_to_convert[] = 'hsla';
+		if ($color_replace_options['convert_cmyk_colors'] == 1) $sheme_to_convert[] = 'cmyk';
+		if ($color_replace_options['convert_cmyka_colors'] == 1) $sheme_to_convert[] = 'cmyka';
+
+		$parsed_color = array(); // init of the replaced colors array
 
 		/* HSL & CYMK */
-		if (preg_match_all('#(hsl|cmyk)\([\'\"]?([^)\'\"]+)[\'\"]?\)#',CSS::$css,$out,PREG_SET_ORDER)) {
+		if (count($sheme_to_convert) > 0 && preg_match_all('#('.implode('|',$sheme_to_convert).')\([\'\"]?([^)\'\"]+)[\'\"]?\)#',CSS::$css,$out,PREG_SET_ORDER)) {
 			foreach ($out as $match) {
 				if (!in_array($match[2],$parsed_color)) {
 					list($all, $scheme, $values) = $match;
-					list($c1, $c2, $c3, $c4) = explode(',', "$values,");
-				
-				  if ($scheme == 'hsl')
+					list($c1, $c2, $c3, $c4,$c5) = explode(',', "$values,,");
+					
+					# Conversion process
+				  if ($scheme == 'hsl' || $scheme == 'hsla')
 						$rgb = self::_hsl_to_rgb($c1, $c2, $c3);
-					else if ($scheme == 'cmyk')
+				  if ($scheme == 'hsla')
+						$rgb[] = $c4;
+					if ($scheme == 'cmyk' || $scheme == 'cmyka')
 						$rgb = self::_cmyk_to_rgb($c1, $c2, $c3, $c4);
-				
-				CSS::replace('#'.$scheme.'\('.$values.'\)#','rgb('.implode(',',$rgb).')',true);
-				$parsed_color[] = $scheme.':'.$values;
+					if ($scheme == 'cmyka')
+						$rgb[] = $c5;
+						
+					CSS::replace('#'.$scheme.'\('.$values.'\)#',(($scheme == 'hsla' || $scheme == 'cmyka') ? 'rgba': 'rgb').'('.implode(',',$rgb).')',true); // css replacements
+					$parsed_color[] = $scheme.':'.$values; // we add the color which has been replaced
+				}
 			}
 		}
-	}
 
 		/* Invalid W3C Colors */
 		$list_colors = implode('|',array_keys(self::$colorsname));
-		if (preg_match_all('#[\s:]('.$list_colors.')[\s;}]#',CSS::$css,$out,PREG_SET_ORDER)) {
+		if (preg_match_all('#[\s:]('.$list_colors.')[\s;}]#',CSS::$css,$out,PREG_SET_ORDER) && $color_replace_options['convert_unvalid_colors'] == 1) {
 			foreach($out as $match) {
 				if (!in_array($color = $match[1],$parsed_color)) {
-					CSS::replace('#([\s:])('.$color.')([\s;}])#','$1'.self::$colorsname[$color].'$3',true);
-					$parsed_color[] = $color;
+					CSS::replace('#([\s:])('.$color.')([\s;}])#','$1'.self::$colorsname[$color].'$3',true); // css replacements
+					$parsed_color[] = $color; // we add the color which has been replaced
 				}
 			}
 		}
