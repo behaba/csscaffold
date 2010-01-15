@@ -149,15 +149,7 @@ class ColorReplace extends Scaffold_Module  {
 	* @param $k Key or black (percentage)
 	* @return $rgb array of rgb colors
 	*/
-	
-	
-	
-
-	
 	public static function _cmyk_to_rgb($c, $m, $y, $k) {
-		
-
-
 		$c = intval($c) / 100;
 		$m = intval($m) / 100;
 		$y = intval($y) / 100;
@@ -166,17 +158,7 @@ class ColorReplace extends Scaffold_Module  {
 		$r = intval((1-min(1,$c*(1-$k)+$k))*255+0.5);
 		$g = intval((1-min(1, $m * (1 - $k) + $k))*255+0.5);
 		$b = intval((1-min(1, $y * (1 - $k) + $k))*255+0.5);
-	
-		/*
-		$c = (255 * intval($c)) / 100;
-		$m = (255 * intval($m)) / 100;
-		$y = (255 * intval($y)) / 100;
-		$k = (255 * intval($k)) / 100;
-		
-		$r = round(((255 - $c) * (255 - $k)) / 255);
-		$g = round((255 - $m) * (255 - $k) / 255);
-		$b = round((255 - $y) * (255 - $k) / 255); 
-		*/
+
 		return array($r,$g,$b);
 	}
 
@@ -189,7 +171,6 @@ class ColorReplace extends Scaffold_Module  {
 	* @param $l Light (percentage)
 	* @return $rgb array of rgb colors
 	*/
-	
 	public static function _hsl_to_rgb($h,$s,$l) {
 		$h = intval($h)/360;
 		$s = intval($s)/100;
@@ -222,7 +203,6 @@ class ColorReplace extends Scaffold_Module  {
    * Example: "color: hsl(20, 80%, 50%);" => "color: rgb(128, 60, 26);"
    */
 	public static function pre_process() {
-	  
 	  # Get the Color Replace options from the config
   	$color_replace_options = CSScaffold::config('ColorReplace');
 
