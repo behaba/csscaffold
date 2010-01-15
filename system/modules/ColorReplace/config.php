@@ -4,5 +4,6 @@ $config = array(
 	'convert_hsl_colors' => true, // allows to convert HSL Colors
 	'convert_hsla_colors' => true, // allows to convert HSL Colors with alpha specification
 	'convert_cmyk_colors' => true, // allows to convert CMYK Colors
-	'convert_cmyka_colors' => true // allows to convert CMYK Colors with alpha specification
+	'convert_cmyka_colors' => true, // allows to convert CMYK Colors with alpha specification
+	'shorten_hexadecimal_colors' => true // allow to shorten hexadecimal colors
 );

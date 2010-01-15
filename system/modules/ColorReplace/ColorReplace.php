@@ -197,12 +197,26 @@ class ColorReplace extends Scaffold_Module  {
 		}
 		return array($r,$g,$b);
 	}
+	
+	/**
+	* Shorten hexadecimal code color
+	* Example: _shorten_hexacolor(#FFFFFF) # => #fff
+	*
+	* @param $hexa_color (hexadecimal format)
+	* @return $shorten_hexa_color string
+	*/
+	public static function _shorten_hexacolor($hexa_color) {
+		$hex_char = '[a-f0-9]';
+		$shorten_hexa_color = strtolower(preg_replace("/(?<=^#)($hex_char)\\1($hex_char)\\2($hex_char)\\3\z/i", '\1\2\3', $hexa_color));
+		return $shorten_hexa_color;
+	}
 
   /**
    * Replaces hsl(), cymk() and invalid W3C colors into rgb() colors
    * Example: "color: hsl(20, 80%, 50%);" => "color: rgb(128, 60, 26);"
    */
 	public static function pre_process() {
+
 	  # Get the Color Replace options from the config
   	$color_replace_options = CSScaffold::config('ColorReplace');
 
@@ -244,6 +258,16 @@ class ColorReplace extends Scaffold_Module  {
 			foreach($out as $match) {
 				if (!in_array($color = $match[1],$parsed_color)) {
 					CSS::replace('#([\s:])('.$color.')([\s;}])#','$1'.self::$colorsname[$color].'$3',true); // css replacements
+					$parsed_color[] = $color; // we add the color which has been replaced
+				}
+			}
+		}
+
+		/* Shorten Hexadecimal Colors */
+		if (preg_match_all('/(#[a-f0-9]{6})/i',CSS::$css,$out,PREG_SET_ORDER) && $color_replace_options['shorten_hexadecimal_colors'] == 1) {
+			foreach($out as $match) {
+				if (!in_array($color = $match[1],$parsed_color)) {
+					CSS::replace($match[1],self::_shorten_hexacolor($match[1])); // css replacements
 					$parsed_color[] = $color; // we add the color which has been replaced
 				}
 			}
