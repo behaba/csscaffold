@@ -355,24 +355,41 @@ class ColorReplace extends Scaffold_Module  {
 		
 		/* Darken/Lighten Colors */
 		$parsed_mixed_color = array(); // init of the replaced mixed colors array
-		if (preg_match_all('/#([a-f0-9]{3,6})\((-|\+)([0-9\.]{0,4})\)|(rgb\([\'\"]?([^)\'\"]+)[\'\"]?\)\((-|\+)([0-9\.]{0,4})\))/i',CSS::$css,$out,PREG_SET_ORDER)) {
+		if (preg_match_all('/#([a-f0-9]{3,6})\((-|\+)([0-9\.]{0,4})\)|((rgba?)\([\'\"]?([^)\'\"]+)[\'\"]?\)\((-|\+)([0-9\.]{0,4})\))/i',CSS::$css,$out,PREG_SET_ORDER)) {
+			/*echo '<pre>';
+			print_r($out);
+			echo '</pre>';
+			*/
 			foreach($out as $match) {
 				if (!in_array($match[0],$parsed_mixed_color)) {
-					$is_rgb = false; // init of rgb detection
-					$color = (isset($match[5])) ? $match[5] : $match[1]; // extract color
-					$operator = (isset($match[6])) ? $match[6] : $match[2]; // + (lighten) or - (darken)
-					$level = (isset($match[7])) ? $match[7] : $match[3]; // lighten/darken level
+					$alpha = false; // init of alpha value
+					$rgb_type = false; // init of rgb detection
+					$color = (isset($match[6])) ? $match[6] : $match[1]; // extract color
+					$operator = (isset($match[7])) ? $match[7] : $match[2]; // + (lighten) or - (darken)
+					$level = (isset($match[8])) ? $match[8] : $match[3]; // lighten/darken level
 					
 					// check if color is rgb
-					if (count($color = explode(',',$color)) == 3) {
+					if (count($color = explode(',',$color)) >= 3) {
+						$rgb_type = $match[5]; // rgb is now true
+						if ($rgb_type == 'rgba')
+							$alpha = $color[3];
 						$color = self::_rgb_to_hex($color);
-						$is_rgb = true; // rgb is now true
 					} else // it's hexadecimal !
 						$color = $color[0];
 					
 					$mixed_color = self::_mix($color, 1-$level, ($operator=='-') ? 0 : 255); // darken or lighten the color
-	
-					CSS::replace( $match[0],($is_rgb==true) ? 'rgb('.implode(',',self::_hex_to_rgb($mixed_color)).')' : self::_shorten_hexacolor('#'.$mixed_color) ); // css replacements
+					
+					if ($rgb_type!=false) {
+						$rgb_values = self::_hex_to_rgb($mixed_color);
+						if ($rgb_type == 'rgba') {
+							$rgb_values[] = $alpha;
+						}
+						$mixed_color_replace = $rgb_type.'('.implode(',',$rgb_values).')';
+					} else {
+							$mixed_color_replace = self::_shorten_hexacolor('#'.$mixed_color);
+					}
+					
+					CSS::replace( $match[0], $mixed_color_replace ); // css replacements
 					$parsed_mixed_color[] = $match[0]; // we add the color which has been replaced
 				}
 			}
