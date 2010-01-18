@@ -355,13 +355,13 @@ class ColorReplace extends Scaffold_Module  {
 		
 		/* Darken/Lighten Colors */
 		$parsed_mixed_color = array(); // init of the replaced mixed colors array
-		if (preg_match_all('/(#([a-f0-9]{3,6})(-|\+)([0-9\.]{0,4})|(rgb\([\'\"]?([^)\'\"]+)[\'\"]?\)(-|\+)([0-9\.]{0,4})))/i',CSS::$css,$out,PREG_SET_ORDER)) {
+		if (preg_match_all('/#([a-f0-9]{3,6})\((-|\+)([0-9\.]{0,4})\)|(rgb\([\'\"]?([^)\'\"]+)[\'\"]?\)\((-|\+)([0-9\.]{0,4})\))/i',CSS::$css,$out,PREG_SET_ORDER)) {
 			foreach($out as $match) {
 				if (!in_array($match[0],$parsed_mixed_color)) {
 					$is_rgb = false; // init of rgb detection
-					$color = (isset($match[6])) ? $match[6] : $match[2]; // extract color
-					$operator = (isset($match[7])) ? $match[7] : $match[3]; // + (lighten) or - (darken)
-					$level = (isset($match[8])) ? $match[8] : $match[4]; // lighten/darken level
+					$color = (isset($match[5])) ? $match[5] : $match[1]; // extract color
+					$operator = (isset($match[6])) ? $match[6] : $match[2]; // + (lighten) or - (darken)
+					$level = (isset($match[7])) ? $match[7] : $match[3]; // lighten/darken level
 					
 					// check if color is rgb
 					if (count($color = explode(',',$color)) == 3) {
