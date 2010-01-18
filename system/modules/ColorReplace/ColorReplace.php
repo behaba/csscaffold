@@ -370,7 +370,7 @@ class ColorReplace extends Scaffold_Module  {
 					} else // it's hexadecimal !
 						$color = $color[0];
 					
-					$mixed_color = self::_mix($color, $level, ($operator=='-') ? 0 : 255); // darken or lighten the color
+					$mixed_color = self::_mix($color, ($operator=='-') ? (1-$level) : $level, ($operator=='-') ? 0 : 255); // darken or lighten the color
 	
 					CSS::replace( $match[0],($is_rgb==true) ? 'rgb('.implode(',',self::_hex_to_rgb($mixed_color)).')' : self::_shorten_hexacolor('#'.$mixed_color) ); // css replacements
 					$parsed_mixed_color[] = $match[0]; // we add the color which has been replaced
