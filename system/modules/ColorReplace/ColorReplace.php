@@ -295,7 +295,7 @@ class ColorReplace extends Scaffold_Module  {
    * Replaces hsl(), cymk() and invalid W3C colors into rgb() colors
    * Example: "color: hsl(20, 80%, 50%);" => "color: rgb(128, 60, 26);"
    */
-	public static function pre_process() {
+	public static function post_process() {
 
 	  # Get the Color Replace options from the config
   	$color_replace_options = CSScaffold::config('ColorReplace');
