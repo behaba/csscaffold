@@ -141,7 +141,7 @@ class ColorReplace extends Scaffold_Module  {
 
 	/**
 	* Converts cmyk colors to rgb colors
-	* Example: _cmyk_to_rgb(87,83,20,10) # => array(30, 39, 184)
+	* Example: _cmyk_to_rgb(87,83,20,10) => array(30, 39, 184)
 	*
 	* @param $c Cyan (percentage)
 	* @param $m Magenta (percentage)
@@ -164,7 +164,7 @@ class ColorReplace extends Scaffold_Module  {
 
 	/**
 	* Converts hsl colors to rgb colors
-	* Example: _hsl_to_rgb(20, 80, 50) # => array(128, 60, 26)
+	* Example: _hsl_to_rgb(20, 80, 50) => array(128, 60, 26)
 	*
 	* @param $h Hue (in degrees)
 	* @param $s Saturation (percentage)
@@ -200,7 +200,7 @@ class ColorReplace extends Scaffold_Module  {
 	
 	/**
 	* Shorten hexadecimal code color
-	* Example: _shorten_hexacolor(#FFFFFF) # => #fff
+	* Example: _shorten_hexacolor(#FFFFFF) => #fff
 	*
 	* @param $hexa_color (hexadecimal format)
 	* @return $shorten_hexa_color string
@@ -209,6 +209,86 @@ class ColorReplace extends Scaffold_Module  {
 		$hex_char = '[a-f0-9]';
 		$shorten_hexa_color = strtolower(preg_replace("/(?<=^#)($hex_char)\\1($hex_char)\\2($hex_char)\\3\z/i", '\1\2\3', $hexa_color));
 		return $shorten_hexa_color;
+	}
+
+	/**
+	* Convert Hexadecimal Color to RGB color
+	* Example: _hex_to_rgb(#FFFFFF) => array(255,255,255)
+	*
+	* @param $hexa_color (hexadecimal format)
+	* @return $rgb array
+	*/
+	public static function _hex_to_rgb($hex) {
+		// Regexp for a valid hex digit
+		$d = '[a-fA-F0-9]';
+
+		// Make sure $hex is valid
+		if (preg_match("/^($d$d)($d$d)($d$d)\$/", $hex, $rgb)) {
+			return array(
+			 hexdec($rgb[1]),
+			 hexdec($rgb[2]),
+			 hexdec($rgb[3])
+			 );
+		}
+		if (preg_match("/^($d)($d)($d)$/", $hex, $rgb)) {
+			
+			return array(
+			 hexdec($rgb[1] . $rgb[1]),
+			 hexdec($rgb[2] . $rgb[2]),
+			 hexdec($rgb[3] . $rgb[3])
+			 );
+		}
+	}
+
+	/**
+	* Convert RGB Color to Hexadecimal color
+	* Example: _rgb_to_hex(array(255,255,255)) => #FFFFFF
+	*
+	* @param $rgb array
+	* @return $hex string (hexadecimal format)
+	*/
+	public static function _rgb_to_hex($rgb) {
+		$hex = "";
+		for($i=0; $i < 3; $i++) {
+
+			// Convert the decimal digit to hex
+			$hexDigit = dechex($rgb[$i]);
+
+			// Add a leading zero if necessary
+			if(strlen($hexDigit) == 1) {
+				$hexDigit = "0" . $hexDigit;
+			}
+
+			// Append to the hex string
+			$hex .= $hexDigit;
+		}
+		// Return the complete hex string
+		return $hex;
+	}
+
+	/**
+	* Darken of lighten a hexadecimal color
+	* Example: _mix(#FFFFFF,0.60,0) => #999
+	*
+	* @param $hex string (hexadecimal format)
+	* @param $percent int (percent)
+	* @param $mask int (0-255)
+	* @return $hex string (hexadecimal format)
+	*/
+	public static function _mix($hex, $percent, $mask) {
+		$rgb = self::_hex_to_rgb($hex);
+		if (!is_array($rgb)) {
+			// hex2RGB will raise an error
+			return false;
+		}
+		for ($i=0; $i<3; $i++) {
+			$rgb[$i] = round($rgb[$i] * $percent) + round($mask * (1-$percent));
+			// In case rounding up causes us to go to 256
+			if ($rgb[$i] > 255) {
+				$rgb[$i] = 255;
+			}
+		}
+		return self::_rgb_to_hex($rgb);
 	}
 
   /**
@@ -269,6 +349,31 @@ class ColorReplace extends Scaffold_Module  {
 				if (!in_array($color = $match[1],$parsed_color)) {
 					CSS::replace($match[1],self::_shorten_hexacolor($match[1])); // css replacements
 					$parsed_color[] = $color; // we add the color which has been replaced
+				}
+			}
+		}
+		
+		/* Darken/Lighten Colors */
+		$parsed_mixed_color = array(); // init of the replaced mixed colors array
+		if (preg_match_all('/(#([a-f0-9]{3,6})(-|\+)([0-9\.]{0,4})|(rgb\([\'\"]?([^)\'\"]+)[\'\"]?\)(-|\+)([0-9\.]{0,4})))/i',CSS::$css,$out,PREG_SET_ORDER)) {
+			foreach($out as $match) {
+				if (!in_array($match[0],$parsed_mixed_color)) {
+					$is_rgb = false; // init of rgb detection
+					$color = (isset($match[6])) ? $match[6] : $match[2]; // extract color
+					$operator = (isset($match[7])) ? $match[7] : $match[3]; // + (lighten) or - (darken)
+					$level = (isset($match[8])) ? $match[8] : $match[4]; // lighten/darken level
+					
+					// check if color is rgb
+					if (count($color = explode(',',$color)) == 3) {
+						$color = self::_rgb_to_hex($color);
+						$is_rgb = true; // rgb is now true
+					} else // it's hexadecimal !
+						$color = $color[0];
+					
+					$mixed_color = self::_mix($color, $level, ($operator=='-') ? 0 : 255); // darken or lighten the color
+	
+					CSS::replace( $match[0],($is_rgb==true) ? 'rgb('.implode(',',self::_hex_to_rgb($mixed_color)).')' : self::_shorten_hexacolor('#'.$mixed_color) ); // css replacements
+					$parsed_mixed_color[] = $match[0]; // we add the color which has been replaced
 				}
 			}
 		}
