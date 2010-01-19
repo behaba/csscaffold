@@ -1,0 +1,16 @@
+/**
+ * Use gradient background in IE, Firefox and Safari
+ */
+=gradient(!color1, !color2, !toptoleft = true)
+{
+	@if(!toptoleft == true)	{
+		filter:progid:DXImageTransform.Microsoft.gradient(enabled='true',GradientType=0,startColorstr=!color1,endColorstr=!color2);
+		background:  !color2 -moz-linear-gradient(top, !color1, !color2) no-repeat top left;
+		background: !color2 -webkit-gradient(linear, left top, left bottom, from(!color1), to(!color2)) no-repeat top left;
+	}
+	@if(!toptoleft == false)	{
+		filter:progid:DXImageTransform.Microsoft.gradient(enabled='true',GradientType=1,startColorstr=!color1,endColorstr=!color2);
+		background: !color2 -moz-linear-gradient(left, !color1, !color2) repeat top left; 
+		background: !color2 -webkit-gradient(linear, left top, right top, from(!color1), to(!color2)) repeat top left;
+	}
+}
