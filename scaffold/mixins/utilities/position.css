@@ -2,29 +2,29 @@
  * Easily position an element around
  * Thanks to Jazen's Compass plugin for these
  */
-=position($mode = "absolute", $top = false, $left = false, $bottom = false, $right = false)
+=position($mode = "absolute", $top = false, $right = false, $bottom = false, $left = false)
 {
 	position:$mode;
 	
 	@if($top !== false) 		{ top:$top; }
-	@if($left !== false) 	{ left:$left; }
 	@if($right !== false) 	{ right:$right; }
 	@if($bottom !== false)	{ bottom:$bottom; }
+	@if($left !== false) 	{ left:$left; }
 }
 
-=absolute($top = false, $left = false, $bottom = false, $right = false)
+=absolute($top = false, $right = false, $bottom = false, $left = false)
 {
-	+position("absolute", $top, $left, $bottom, $right);
+	+position("absolute", $top, $right, $bottom, $left);
 }
 
-=relative($top = false, $left = false, $bottom = false, $right = false)
+=relative($top = false, $right = false, $bottom = false, $left = false)
 {
-	+position("relative", $top, $left, $bottom, $right);
+	+position("relative", $top, $right, $bottom, $left);
 }
 
-=move($top = false, $left = false, $bottom = false, $right = false)
+=move($top = false, $right = false, $bottom = false, $left = false)
 {
-	+relative($top, $left, $bottom, $right);
+	+relative($top, $right, $bottom, $left);
 }
 
 =move-up($up = 0)
