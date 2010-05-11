@@ -3,7 +3,9 @@
  */
 =rotate($angle)
 {
-	-webkit-transform: rotate(#[$angle]deg);
-	-moz-transform: rotate(#[$angle]deg);
-	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=#[90 / $angle]);
+	rotation: {$angle}deg;
+	-webkit-transform: rotate({$angle}deg);
+	-moz-transform: rotate({$angle}deg);
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=calc($angle/90));
+	-ms-filter:"progid:DXImageTransform.Microsoft.BasicImage(rotation=calc($angle/90))";
 }
