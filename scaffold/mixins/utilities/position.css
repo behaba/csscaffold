@@ -1,0 +1,74 @@
+/**
+ * Easily position an element around
+ * Thanks to Jazen's Compass plugin for these
+ */
+=position($mode = "absolute", $top = false, $left = false, $bottom = false, $right = false)
+{
+	position:$mode;
+	
+	@if($top !== false) 		{ top:$top; }
+	@if($left !== false) 	{ left:$left; }
+	@if($right !== false) 	{ right:$right; }
+	@if($bottom !== false)	{ bottom:$bottom; }
+}
+
+=absolute($top = false, $left = false, $bottom = false, $right = false)
+{
+	+position("absolute", $top, $left, $bottom, $right);
+}
+
+=absolute-tr($top = 0, $right = 0)
+{
+	+position("absolute", $top, false, false, $right);
+}
+
+=absolute-tl($top = 0, $left = 0)
+{
+	+position("absolute", $top, $left, false, false);
+}
+
+=absolute-br($bottom = 0, $right = 0)
+{
+	+position("absolute", false, false, $bottom, $right);
+}
+
+=absolute-bl($bottom = 0, $left = 0)
+{
+	+position("absolute", false, $left, $bottom, false);
+}
+
+=relative($top = false, $left = false, $bottom = false, $right = false)
+{
+	+position("relative", $top, $left, $bottom, $right);
+}
+
+=move($top = false, $left = false, $bottom = false, $right = false)
+{
+	+relative($top, $left, $bottom, $right);
+}
+
+=move-up($up = 0)
+{
+	+move(-$up);
+}
+
+=move-right($right = 0)
+{
+	+move(false, false, false, -$right);
+}
+
+=move-down($down = 0)
+{
+	+move(false, false, -$down);
+}
+
+=move-left($left = 0)
+{
+	+move(false, -$left);
+}
+
+=size($width, $height)
+{
+	width:$width;
+	height:$height;
+}
