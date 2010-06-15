@@ -33,8 +33,8 @@
 
 =columns-base
 {
-	position:relative;
 	float:left;
+	display:inline;
 	margin-right:$right_gutter_width;
 	margin-left:$left_gutter_width;	
 }

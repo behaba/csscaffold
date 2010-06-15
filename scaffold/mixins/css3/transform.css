@@ -1,0 +1,12 @@
+/**
+ * Cross-modern-browser transform mixin :)
+ *
+ *
+ */
+=transform($function)
+{
+   -moz-transform:$function;
+   -webkit-transform:$function;
+   -o-transform:$function;
+   transform:$function;
+}
