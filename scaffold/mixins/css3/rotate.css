@@ -16,7 +16,7 @@
    transform: rotate({$angle});
 	-webkit-transform: rotate({$angle});
 	-moz-transform: rotate({$angle});
-	filter:ie_matrix_rotate({$angle});
-	-ms-filter:ie_matrix_rotate({$angle});
+	filter:ie-matrix-rotate({$angle});
+	-ms-filter:ie-matrix-rotate({$angle});
 	+has-layout;
 }

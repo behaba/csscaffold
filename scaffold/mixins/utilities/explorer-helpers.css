@@ -78,8 +78,6 @@
 */
 
 =iepng-hover($url, $sizingMethod = 'image') {
-	
-	/* Apply rules to nested parent */
 	? {
 		background-image: none;
 		overflow: hidden;
@@ -144,8 +142,6 @@
 */
 
 =iepng-hover-matrix($url, $width, $height, $x = 0, $y = 0, $sizingMethod = 'image') {
-	
-	/* Apply rules to nested parent */
 	? {
 		background-image: none;
 		overflow: hidden;
