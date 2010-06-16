@@ -3,19 +3,19 @@
  */
 =rotation($angle)
 {
-   transform: rotate({$angle});
-	-webkit-transform: rotate({$angle});
-	-moz-transform: rotate({$angle});
+	transform: rotate({$angle}deg);
+	-webkit-transform: rotate({$angle}deg);
+	-moz-transform: rotate({$angle}deg);
 }
 
 /**
- * Rotate an element 90, 180 or 270 degrees
+ * Rotate an element by any degree including IE
  */
 =rotate($angle)
 {
-   transform: rotate({$angle});
-	-webkit-transform: rotate({$angle});
-	-moz-transform: rotate({$angle});
+	transform: rotate({$angle}deg);
+	-webkit-transform: rotate({$angle}deg);
+	-moz-transform: rotate({$angle}deg);
 	filter:ie-matrix-rotate({$angle});
 	-ms-filter:ie-matrix-rotate({$angle});
 	+has-layout;
